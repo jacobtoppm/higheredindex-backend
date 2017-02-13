@@ -1,0 +1,25 @@
+{
+  "name": "febp-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/newamericafoundation/febp-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/newamericafoundation/febp-backend/issues"
+  },
+  "homepage": "https://github.com/newamericafoundation/febp-backend#readme",
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "express": "^4.14.1",
+    "mongodb": "^2.2.23",
+    "path": "^0.12.7"
+  }
+}
