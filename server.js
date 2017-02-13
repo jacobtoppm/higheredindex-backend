@@ -33,16 +33,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-// const staticPath = express.static(path.join(__dirname, '/src/static'))
-// app.use('/static', staticPath)
-
-// const indexPath = path.join(__dirname, 'src/static/index-static.html')
-// // var distDir = __dirname + "/src/app-client.js";
-// app.get('*', (req, res) => {
-//   console.log("hello!!!!!");
-//   res.sendFile(indexPath);
-// });
-
 app.get('/api/state-list', (req, res) => {
   // const filter = {};
 
