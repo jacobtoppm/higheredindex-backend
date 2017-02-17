@@ -9,6 +9,19 @@ app.use(bodyParser.json());
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 var db;
 
+var sortAlpha = (a, b) => {
+  let A = a.name.toLowerCase(),
+    B = b.name.toLowerCase();
+
+  if (A < B){
+    return -1;
+  } else if (A > B){
+    return  1;
+  } else {
+    return 0;
+  }
+}
+
 // Connect to the database before starting the application server.
 mongodb.MongoClient.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/live_test', function (err, database) {
   if (err) {
@@ -34,20 +47,19 @@ app.use(function(req, res, next) {
 });
 
 app.get('/api/state-list', (req, res) => {
-  // const filter = {};
-
-  // stateModel.find(filter, { name: 1, path: 1 }, (err, states) => {
-  //   if (err) {
-  //     return console.error(err);
-  //   }
-  //   console.log(states);
-  //   return res.json(states);
-  // });
-  return [{}];
+  db.collection('final_test').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
+    docs.sort(sortAlpha);
+    if (err) {
+      handleError(res, err.message, "Failed to get states.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
 });
 
 app.get('/api/institution-list', (req, res) => {
   db.collection('final_test').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
+    docs.sort(sortAlpha);
     if (err) {
       handleError(res, err.message, "Failed to get institutions.");
     } else {
