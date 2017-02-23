@@ -88,3 +88,24 @@ app.get('/api/institution/:path', (req, res) => {
     }
   });
 });
+
+app.get('/api/data-download/:collection/:type', (req, res) => {
+  const { collection, type } = req.params;
+  let whichField = {};
+  whichField[type] = 1;
+  console.log(whichField);
+  console.log(collection, type);
+
+  console.log(req.params.collection);
+  db.collection('final_test').find({}, whichField).toArray(function(err, docs) {
+    docs = docs.map((d) => {
+      return d[type][0];
+    })
+    // docs.sort(sortAlpha);
+    if (err) {
+      handleError(res, err.message, "Failed to get");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+});
