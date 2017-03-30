@@ -68,6 +68,17 @@ app.get('/api/institution-list', (req, res) => {
   });
 });
 
+app.get('/api/indicator-list', (req, res) => {
+  db.collection('indicators').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
+    docs.sort(sortAlpha);
+    if (err) {
+      handleError(res, err.message, "Failed to get indicators.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+});
+
 app.get('/api/state/:path', (req, res) => {
   db.collection('states_combined').findOne({path:req.params.path}, function(err, docs) {
     if (err) {
@@ -82,6 +93,30 @@ app.get('/api/institution/:path', (req, res) => {
   db.collection('inst_combined').findOne({path:req.params.path}, function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get institutions.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+});
+
+app.get('/api/indicator/:path', (req, res) => {
+  db.collection('indicators').findOne({path:req.params.path}, function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get indicators.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+});
+
+app.post('/api/update_indicator', (req, res) => {
+  var id = new mongodb.ObjectId(req.body._id);
+  delete req.body._id
+
+  db.collection('indicators').updateOne({_id: id}, { $set: req.body}, function(err, docs) {
+    console.log(err, docs);
+    if (err) {
+      handleError(res, err.message, "Failed to set indicators.");
     } else {
       res.status(200).json(docs);
     }
