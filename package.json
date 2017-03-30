@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "start-dev": "NODE_ENV=development node server.js",
     "start": "node server.js"
   },
   "repository": {
