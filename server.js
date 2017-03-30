@@ -23,7 +23,7 @@ var sortAlpha = (a, b) => {
 }
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect('mongodb://localhost:27017/febp', function (err, database) {
+mongodb.MongoClient.connect('mongodb://heroku_2l5qrfnd:bm3ve3469v2or4vpb1c2ajq0rm@ds151909.mlab.com:51909/heroku_2l5qrfnd/febp', function (err, database) {
   if (err) {
     console.log(err);
     process.exit(1);
