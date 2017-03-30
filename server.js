@@ -23,7 +23,7 @@ var sortAlpha = (a, b) => {
 }
 
 // Connect to the database before starting the application server.
-mongodb.MongoClient.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/live_test', function (err, database) {
+mongodb.MongoClient.connect('mongodb://localhost:27017/febp', function (err, database) {
   if (err) {
     console.log(err);
     process.exit(1);
@@ -47,7 +47,7 @@ app.use(function(req, res, next) {
 });
 
 app.get('/api/state-list', (req, res) => {
-  db.collection('final_test').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
+  db.collection('states_combined').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
     docs.sort(sortAlpha);
     if (err) {
       handleError(res, err.message, "Failed to get states.");
@@ -58,7 +58,7 @@ app.get('/api/state-list', (req, res) => {
 });
 
 app.get('/api/institution-list', (req, res) => {
-  db.collection('final_test').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
+  db.collection('inst_combined').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
     docs.sort(sortAlpha);
     if (err) {
       handleError(res, err.message, "Failed to get institutions.");
@@ -69,18 +69,7 @@ app.get('/api/institution-list', (req, res) => {
 });
 
 app.get('/api/state/:path', (req, res) => {
-  stateModel.findOne({
-    path: req.params.path,
-  }, (err, state) => {
-    if (err) {
-      return console.error(err);
-    }
-    return res.json(state);
-  });
-});
-
-app.get('/api/institution/:path', (req, res) => {
-  db.collection('final_test').findOne({path:req.params.path}, function(err, docs) {
+  db.collection('states_combined').findOne({path:req.params.path}, function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to get institutions.");
     } else {
@@ -89,23 +78,44 @@ app.get('/api/institution/:path', (req, res) => {
   });
 });
 
-app.get('/api/data-download/:collection/:type', (req, res) => {
-  const { collection, type } = req.params;
-  let whichField = {};
-  whichField[type] = 1;
-  console.log(whichField);
-  console.log(collection, type);
-
-  console.log(req.params.collection);
-  db.collection('final_test').find({}, whichField).toArray(function(err, docs) {
-    docs = docs.map((d) => {
-      return d[type][0];
-    })
-    // docs.sort(sortAlpha);
+app.get('/api/institution/:path', (req, res) => {
+  db.collection('inst_combined').findOne({path:req.params.path}, function(err, docs) {
     if (err) {
-      handleError(res, err.message, "Failed to get");
+      handleError(res, err.message, "Failed to get institutions.");
     } else {
       res.status(200).json(docs);
     }
   });
 });
+
+// app.get('/api/states/:type', (req, res) => {
+//   db.collection('fake_states').find({}).toArray(function(err, docs) {
+//     console.log(docs);
+//     if (err) {
+//       handleError(res, err.message, "Failed to get");
+//     } else {
+//       res.status(200).json(docs);
+//     }
+//   });
+// });
+
+// app.get('/api/data-download/:collection/:type', (req, res) => {
+//   const { collection, type } = req.params;
+//   let whichField = {};
+//   whichField[type] = 1;
+//   console.log(whichField);
+//   console.log(collection, type);
+
+//   console.log(req.params.collection);
+//   db.collection('febp').find({}, whichField).toArray(function(err, docs) {
+//     docs = docs.map((d) => {
+//       return d[type][0];
+//     })
+//     // docs.sort(sortAlpha);
+//     if (err) {
+//       handleError(res, err.message, "Failed to get");
+//     } else {
+//       res.status(200).json(docs);
+//     }
+//   });
+// });
