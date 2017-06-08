@@ -7,7 +7,7 @@ var app = express();
 app.use(bodyParser.json());
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
-var db;
+let db;
 
 var sortAlpha = (a, b) => {
   let A = a.name.toLowerCase(),
@@ -79,25 +79,70 @@ app.get('/api/indicator-list', (req, res) => {
   });
 });
 
-app.get('/api/state/:path/:sheet', (req, res) => {
-  console.log(req.params.sheet)
-  db.collection('states_' + req.params.sheet).findOne({path:req.params.path}, function(err, docs) {
-    if (err) {
-      handleError(res, err.message, "Failed to get state.");
-    } else {
-      res.status(200).json(docs);
-    }
-  });
+
+let fetchCollection = (collection, path) => {
+  return new Promise((resolve, reject) => {
+    db.collection(collection).findOne({path:path}, function(err, docs) {
+      if (err) {
+        reject(err);
+      } else {
+        console.log("finished " + collection);
+        resolve(docs);
+      }
+    })
+  })
+}
+
+app.get('/api/state/:path', (req, res) => {
+  Promise.all([
+      fetchCollection("states_grants", req.params.path),
+      fetchCollection("states_loans", req.params.path),
+      fetchCollection("states_outcomes", req.params.path),
+      fetchCollection("states_schools", req.params.path),
+      fetchCollection("states_students", req.params.path),
+    ])
+    .then(([grants, loans, outcomes, schools, students]) => {
+      let responseObject = {
+        name: grants.name,
+        path: grants.path,
+        grants: grants,
+        loans: loans,
+        outcomes: outcomes,
+        schools: schools,
+        students: students
+      } 
+      res.status(200).json(responseObject); 
+    })
+    .catch(function(err) {
+      // Will catch failure of first failed promise
+      console.log("Failed:", err);
+    });
 });
 
-app.get('/api/institution/:path/:sheet', (req, res) => {
-  db.collection('inst_' + req.params.sheet).findOne({path:req.params.path}, function(err, docs) {
-    if (err) {
-      handleError(res, err.message, "Failed to get institution.");
-    } else {
-      res.status(200).json(docs);
-    }
-  });
+app.get('/api/institution/:path', (req, res) => {
+  Promise.all([
+      fetchCollection("inst_grants", req.params.path),
+      fetchCollection("inst_loans", req.params.path),
+      fetchCollection("inst_outcomes", req.params.path),
+      fetchCollection("inst_schools", req.params.path),
+      fetchCollection("inst_students", req.params.path),
+    ])
+    .then(([grants, loans, outcomes, schools, students]) => {
+      let responseObject = {
+        name: grants.name,
+        path: grants.path,
+        grants: grants,
+        loans: loans,
+        outcomes: outcomes,
+        schools: schools,
+        students: students
+      } 
+      res.status(200).json(responseObject); 
+    })
+    .catch(function(err) {
+      // Will catch failure of first failed promise
+      console.log("Failed:", err);
+    });
 });
 
 app.get('/api/indicator/:path', (req, res) => {
