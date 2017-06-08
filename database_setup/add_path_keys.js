@@ -4,9 +4,9 @@ db = conn.getDB("febp");
 valList = []
 
 // db.states_combined.updateMany( {}, { $rename: { "state": "name"}});
-// db.inst_combined.updateMany( {}, { $rename: { "school": "name"}});
+db.inst_combined.updateMany( {}, { $rename: { "school": "name"}});
 
-cursor = db.states_combined.find();
+cursor = db.inst_combined.find();
 
 while ( cursor.hasNext()) {
 	curr = cursor.next();
@@ -21,7 +21,7 @@ while ( cursor.hasNext()) {
 		print(path)
 	}
 
-	db.states_combined.updateOne(
+	db.inst_combined.updateOne(
 		{"_id": id},
 		{ $set: { path : path }}
 	);
