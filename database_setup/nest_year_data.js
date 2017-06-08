@@ -2,7 +2,6 @@ conn = new Mongo();
 // db = conn.getDB("ds151909.mlab.com:51909/heroku_2l5qrfnd");
 db = connect("localhost:27017/febp");
 
-// sections = ["states_students"];
 // sections = ["states_students", "states_grants", "states_outcomes", "states_loans", "states_schools"];
 sections = ["inst_students", "inst_grants", "inst_outcomes", "inst_loans", "inst_schools"]
 

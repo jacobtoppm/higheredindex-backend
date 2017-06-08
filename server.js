@@ -47,7 +47,7 @@ app.use(function(req, res, next) {
 });
 
 app.get('/api/state-list', (req, res) => {
-  db.collection('states_combined').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
+  db.collection('states_students').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
     docs.sort(sortAlpha);
     if (err) {
       handleError(res, err.message, "Failed to get states.");
@@ -58,7 +58,7 @@ app.get('/api/state-list', (req, res) => {
 });
 
 app.get('/api/institution-list', (req, res) => {
-  db.collection('inst_combined').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
+  db.collection('inst_students').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
     docs.sort(sortAlpha);
     if (err) {
       handleError(res, err.message, "Failed to get institutions.");
@@ -79,20 +79,21 @@ app.get('/api/indicator-list', (req, res) => {
   });
 });
 
-app.get('/api/state/:path', (req, res) => {
-  db.collection('states_combined').findOne({path:req.params.path}, function(err, docs) {
+app.get('/api/state/:path/:sheet', (req, res) => {
+  console.log(req.params.sheet)
+  db.collection('states_' + req.params.sheet).findOne({path:req.params.path}, function(err, docs) {
     if (err) {
-      handleError(res, err.message, "Failed to get institutions.");
+      handleError(res, err.message, "Failed to get state.");
     } else {
       res.status(200).json(docs);
     }
   });
 });
 
-app.get('/api/institution/:path', (req, res) => {
-  db.collection('inst_combined').findOne({path:req.params.path}, function(err, docs) {
+app.get('/api/institution/:path/:sheet', (req, res) => {
+  db.collection('inst_' + req.params.sheet).findOne({path:req.params.path}, function(err, docs) {
     if (err) {
-      handleError(res, err.message, "Failed to get institutions.");
+      handleError(res, err.message, "Failed to get institution.");
     } else {
       res.status(200).json(docs);
     }
@@ -122,17 +123,6 @@ app.post('/api/update_indicator', (req, res) => {
     }
   });
 });
-
-// app.get('/api/states/:type', (req, res) => {
-//   db.collection('fake_states').find({}).toArray(function(err, docs) {
-//     console.log(docs);
-//     if (err) {
-//       handleError(res, err.message, "Failed to get");
-//     } else {
-//       res.status(200).json(docs);
-//     }
-//   });
-// });
 
 // app.get('/api/data-download/:collection/:type', (req, res) => {
 //   const { collection, type } = req.params;
