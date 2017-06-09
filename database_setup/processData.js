@@ -133,3 +133,7 @@ function setFullStateNames(collection) {
 		);
 	}
 }
+
+module.exports = {
+	nestYears: nestYears
+}

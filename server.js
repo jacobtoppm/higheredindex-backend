@@ -1,10 +1,12 @@
 var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
+var Mongonaut = require("mongonaut");
+var dataProcessingFunctions = require("./processUploadedData.js")
 const path = require('path');
 const dbUrl = process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/febp" : "mongodb://heroku_2l5qrfnd:bm3ve3469v2or4vpb1c2ajq0rm@ds151909.mlab.com:51909/heroku_2l5qrfnd";
 var app = express();
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 let db;
@@ -153,6 +155,27 @@ app.get('/api/indicator/:path', (req, res) => {
       res.status(200).json(docs);
     }
   });
+});
+
+app.post('/api/update_data/:collection', (req, res) => {
+  db.collection(req.params.collection).drop();
+  // console.log(req.body);
+
+  var processedData = dataProcessingFunctions.processData(req.body);
+
+  console.log(processedData);
+
+  db.collection(req.params.collection).insertMany(processedData, function(err, docs) {
+    console.log(err, docs);
+    if (err) {
+      handleError(res, err.message, "Failed to update data");
+    } else {
+      console.log("success!");
+      res.status(200).json(docs);
+    }
+  });
+
+
 });
 
 app.post('/api/update_indicator', (req, res) => {
