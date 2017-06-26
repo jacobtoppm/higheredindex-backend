@@ -22,7 +22,9 @@ function nestYears(inputData) {
 				}
 			}
 		}
-		retArray.push(currItem);
+		if (Object.keys(d).length > 1) {
+			retArray.push(currItem);
+		}
 	})
 
 	return retArray;
@@ -54,9 +56,13 @@ function addPathKeys(inputData) {
 }
 
 function processData(inputData) {
+	console.log("nesting years", inputData.length)
 	let nested = nestYears(inputData);
+	console.log("adding full names", nested.length)
 	let withFullStateNames = addFullStateNames(nested);
+	console.log("adding paths", withFullStateNames.length)
 	let withPathKeys = addPathKeys(withFullStateNames);
+	console.log("finished", withPathKeys.length)
 
 	return withPathKeys;
 }

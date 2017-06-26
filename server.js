@@ -12,8 +12,8 @@ app.use(bodyParser.json({limit: '50mb'}));
 let db;
 
 var sortAlpha = (a, b) => {
-  let A = a.name.toLowerCase(),
-    B = b.name.toLowerCase();
+  let A = a.name ? a.name.toLowerCase() : null,
+    B = b.name ? b.name.toLowerCase() : null;
 
   if (A < B){
     return -1;
@@ -52,7 +52,8 @@ app.get('/api/state-list', (req, res) => {
   db.collection('states_students').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
     docs.sort(sortAlpha);
     if (err) {
-      handleError(res, err.message, "Failed to get states.");
+      res.status(500)
+      res.render('error', {error:err.message});
     } else {
       res.status(200).json(docs);
     }
@@ -63,7 +64,8 @@ app.get('/api/institution-list', (req, res) => {
   db.collection('inst_students').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
     docs.sort(sortAlpha);
     if (err) {
-      handleError(res, err.message, "Failed to get institutions.");
+      res.status(500)
+      res.render('error', {error:err.message});
     } else {
       res.status(200).json(docs);
     }
@@ -150,7 +152,8 @@ app.get('/api/institution/:path', (req, res) => {
 app.get('/api/indicator/:path', (req, res) => {
   db.collection('indicators').findOne({path:req.params.path}, function(err, docs) {
     if (err) {
-      handleError(res, err.message, "Failed to get indicators.");
+      res.status(500)
+      res.render('error', {error:err})
     } else {
       res.status(200).json(docs);
     }
@@ -162,16 +165,16 @@ app.post('/api/update_data/:collection', (req, res) => {
   // console.log(req.body);
 
   var processedData = dataProcessingFunctions.processData(req.body);
-
   console.log(processedData);
 
   db.collection(req.params.collection).insertMany(processedData, function(err, docs) {
     console.log(err, docs);
     if (err) {
-      handleError(res, err.message, "Failed to update data");
+      res.status(500)
+      res.render('error', {error:err})
     } else {
       console.log("success!");
-      res.status(200).json(docs);
+      res.status(200).json({});
     }
   });
 
