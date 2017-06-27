@@ -3,7 +3,7 @@ db = conn.getDB("febp");
 
 valList = []
 
-// db.states_combined.updateMany( {}, { $rename: { "state": "name"}});
+db.states_combined.updateMany( {}, { $rename: { "state": "name"}});
 // db.inst_combined.updateMany( {}, { $rename: { "school": "name"}});
 
 cursor = db.states_combined.find();
