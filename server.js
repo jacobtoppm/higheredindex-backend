@@ -181,18 +181,45 @@ app.post('/api/update_data/:collection', (req, res) => {
 
 });
 
-app.post('/api/update_indicator', (req, res) => {
-  var id = new mongodb.ObjectId(req.body._id);
-  delete req.body._id
+app.post('/api/update_indicator/', (req, res) => {
+  console.log(req.body);
+  var action = req.body.action;
+  delete req.body.action;
 
-  db.collection('indicators').updateOne({_id: id}, { $set: req.body}, function(err, docs) {
-    console.log(err, docs);
-    if (err) {
-      handleError(res, err.message, "Failed to set indicators.");
-    } else {
-      res.status(200).json(docs);
-    }
-  });
+  if (action == "update") {
+    var id = new mongodb.ObjectId(req.body._id);
+    delete req.body._id
+
+    db.collection('indicators').updateOne({_id: id}, { $set: req.body}, function(err, docs) {
+      console.log(err, docs);
+      if (err) {
+        handleError(res, err.message, "Failed to set indicators.");
+      } else {
+        res.status(200).json(docs);
+      }
+    });
+  } else if (action == "insert") {
+     db.collection('indicators').insert(req.body, function(err, docs) {
+      console.log(err, docs);
+      if (err) {
+        handleError(res, err.message, "Failed to set indicators.");
+      } else {
+        res.status(200).json(docs);
+      }
+    });
+  } else {
+    var id = new mongodb.ObjectId(req.body._id);
+    delete req.body._id
+
+    db.collection('indicators').deleteOne({_id: id}, function(err, docs) {
+      console.log(err, docs);
+      if (err) {
+        handleError(res, err.message, "Failed to set indicators.");
+      } else {
+        res.status(200).json(docs);
+      }
+    });
+  }
 });
 
 // app.get('/api/data-download/:collection/:type', (req, res) => {
