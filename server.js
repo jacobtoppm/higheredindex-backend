@@ -2,6 +2,8 @@ var express = require("express");
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var Mongonaut = require("mongonaut");
+var json2csv = require('json2csv');
+var fs = require('fs');
 var dataProcessingFunctions = require("./processUploadedData.js")
 const path = require('path');
 const dbUrl = process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/febp" : "mongodb://heroku_2l5qrfnd:bm3ve3469v2or4vpb1c2ajq0rm@ds151909.mlab.com:51909/heroku_2l5qrfnd";
@@ -222,23 +224,22 @@ app.post('/api/update_indicator/', (req, res) => {
   }
 });
 
-// app.get('/api/data-download/:collection/:type', (req, res) => {
-//   const { collection, type } = req.params;
-//   let whichField = {};
-//   whichField[type] = 1;
-//   console.log(whichField);
-//   console.log(collection, type);
-
-//   console.log(req.params.collection);
-//   db.collection('febp').find({}, whichField).toArray(function(err, docs) {
-//     docs = docs.map((d) => {
-//       return d[type][0];
-//     })
-//     // docs.sort(sortAlpha);
-//     if (err) {
-//       handleError(res, err.message, "Failed to get");
-//     } else {
-//       res.status(200).json(docs);
-//     }
-//   });
-// });
+app.get('/api/download_data/:collection', (req, res) => {
+  const { collection } = req.params;
+  
+  db.collection(collection).find({}).toArray(function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to get");
+    } else {
+      json2csv({ data:docs, flatten:true}, function(err, csv) {
+        if (err) return console.log(err);
+        
+        fs.writeFile(collection + '.csv', csv, function(err) {
+          if (err) throw err;
+          
+          res.download(collection + '.csv');
+        });
+      });
+    }
+  });
+});
