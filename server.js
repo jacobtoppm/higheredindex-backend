@@ -224,48 +224,6 @@ app.post('/api/update_indicator/', (req, res) => {
   }
 });
 
-app.post('/api/update_viz_section/', (req, res) => {
-  console.log(req.body);
-  var collection = req.body.collection;
-  var action = req.body.action;
-  delete req.body.action;
-
-  if (action == "update") {
-    var id = new mongodb.ObjectId(req.body._id);
-    delete req.body._id
-
-    db.collection(collection).updateOne({_id: id}, { $set: req.body}, function(err, docs) {
-      console.log(err, docs);
-      if (err) {
-        handleError(res, err.message, "Failed to set indicators.");
-      } else {
-        res.status(200).json(docs);
-      }
-    });
-  } else if (action == "insert") {
-     db.collection(collection).insert(req.body, function(err, docs) {
-      console.log(err, docs);
-      if (err) {
-        handleError(res, err.message, "Failed to set indicators.");
-      } else {
-        res.status(200).json(docs);
-      }
-    });
-  } else {
-    var id = new mongodb.ObjectId(req.body._id);
-    delete req.body._id
-
-    db.collection(collection).deleteOne({_id: id}, function(err, docs) {
-      console.log(err, docs);
-      if (err) {
-        handleError(res, err.message, "Failed to set indicators.");
-      } else {
-        res.status(200).json(docs);
-      }
-    });
-  }
-});
-
 app.get('/api/download_data/:collection', (req, res) => {
   const { collection } = req.params;
   
