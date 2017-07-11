@@ -187,7 +187,7 @@ app.post('/api/update_data/:collection', (req, res) => {
       res.render('error', {error:err})
     } else {
       console.log("success!");
-      db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date()}})
+      db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date()}}, { upsert: true})
       res.status(200).json({});
     }
   });
