@@ -32,3 +32,6 @@ Uploading to Production Database
 
 mongodump --db febp
 
+
+
+db.data_info.insertMany([{collection:"states_grants"}, {collection:"states_loans"}, {collection:"states_schools"}, {collection:"states_students"}, {collection:"states_outcomes"}, {collection:"inst_grants"}, {collection:"inst_loans"}, {collection:"inst_outcomes"}, {collection:"inst_students"}, {collection:"inst_schools"}]);

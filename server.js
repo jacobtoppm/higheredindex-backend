@@ -85,6 +85,17 @@ app.get('/api/indicator-list', (req, res) => {
   });
 });
 
+app.get('/api/data-info', (req, res) => {
+  db.collection('data_info').find({}).toArray(function(err, docs) {
+    if (err) {
+      res.status(500)
+      res.render('error', {error:err.message});
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+});
+
 
 let fetchCollection = (collection, path) => {
   return new Promise((resolve, reject) => {
@@ -176,6 +187,7 @@ app.post('/api/update_data/:collection', (req, res) => {
       res.render('error', {error:err})
     } else {
       console.log("success!");
+      db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date()}})
       res.status(200).json({});
     }
   });
