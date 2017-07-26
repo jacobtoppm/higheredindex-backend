@@ -173,14 +173,23 @@ app.get('/api/indicator/:path', (req, res) => {
   });
 });
 
+app.get('/api/inst_locations/:state', (req, res) => {
+  console.log(req.params.state)
+  db.collection('inst_students').find({STABBR:req.params.state}, {name: 1, path: 1, LONGITUD: 1, LATITUDE: 1}).toArray(function(err, docs) {
+    if (err) {
+      res.status(500)
+      res.render('error', {error:err.message});
+    } else {
+      console.log(docs)
+      res.status(200).json(docs);
+    }
+  });
+});
+
 app.post('/api/update_data/:collection', (req, res) => {
   db.collection(req.params.collection).drop();
-  // console.log(req.body);
 
-  var processedData = dataProcessingFunctions.processData(req.body);
-  console.log(processedData);
-
-  db.collection(req.params.collection).insertMany(processedData, function(err, docs) {
+  db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
     console.log(err, docs);
     if (err) {
       res.status(500)
