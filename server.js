@@ -173,8 +173,8 @@ app.get('/api/indicator/:path', (req, res) => {
   });
 });
 
-app.get('/api/get_rankings/:collection/:variable/:value', (req, res) => {
-  var variable = String(req.params.variable);
+app.get('/api/get-ranking/:collection/:variable/:year/:value', (req, res) => {
+  var variable = req.params.variable + "." + req.params.year;
     value = { $gt : Number(req.params.value)},
     query = {};
 
@@ -186,7 +186,7 @@ app.get('/api/get_rankings/:collection/:variable/:value', (req, res) => {
       res.render('error', {error:err.message});
     } else {
       console.log(docs.length)
-      res.status(200).json(docs);
+      res.status(200).json(docs.length);
     }
   });
 });
