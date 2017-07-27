@@ -173,6 +173,24 @@ app.get('/api/indicator/:path', (req, res) => {
   });
 });
 
+app.get('/api/get_rankings/:collection/:variable/:value', (req, res) => {
+  var variable = String(req.params.variable);
+    value = { $gt : Number(req.params.value)},
+    query = {};
+
+  query[variable] = value;
+
+  db.collection(req.params.collection).find(query, {name : 1}).toArray(function(err, docs) {
+    if (err) {
+      res.status(500)
+      res.render('error', {error:err.message});
+    } else {
+      console.log(docs.length)
+      res.status(200).json(docs);
+    }
+  });
+});
+
 app.get('/api/inst_locations/:state', (req, res) => {
   console.log(req.params.state)
   db.collection('inst_students').find({STABBR:req.params.state}, {name: 1, path: 1, LONGITUD: 1, LATITUDE: 1}).toArray(function(err, docs) {
