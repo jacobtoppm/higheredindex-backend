@@ -8,7 +8,8 @@ var dataProcessingFunctions = require("./processUploadedData.js")
 const path = require('path');
 const dbUrl = process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/febp" : "mongodb://heroku_2l5qrfnd:bm3ve3469v2or4vpb1c2ajq0rm@ds151909.mlab.com:51909/heroku_2l5qrfnd";
 var app = express();
-app.use(bodyParser.json({limit: '50mb'}));
+
+app.use(bodyParser.json({limit: '100mb'}));
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 let db;
@@ -173,19 +174,24 @@ app.get('/api/indicator/:path', (req, res) => {
   });
 });
 
-app.get('/api/get-ranking/:collection/:variable/:year/:value', (req, res) => {
+app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, res) => {
   var variable = req.params.variable + "." + req.params.year;
-    value = { $gt : Number(req.params.value)},
-    query = {};
+  var queryVal;
+  var query = {};
 
-  query[variable] = value;
+  if (req.params.direction == "lowest") {
+    queryVal = { $lt : Number(req.params.value)};
+  } else {
+    queryVal = { $gt : Number(req.params.value)};
+  }
+  
+  query[variable] = queryVal;
 
   db.collection(req.params.collection).find(query, {name : 1}).toArray(function(err, docs) {
     if (err) {
       res.status(500)
       res.render('error', {error:err.message});
     } else {
-      console.log(docs.length)
       res.status(200).json(docs.length);
     }
   });
