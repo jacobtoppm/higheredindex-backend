@@ -214,7 +214,6 @@ app.post('/api/update_data/:collection', (req, res) => {
   db.collection(req.params.collection).drop();
 
   db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
-    console.log(err, docs);
     if (err) {
       res.status(500)
       res.render('error', {error:err})
