@@ -135,7 +135,7 @@ app.get('/api/state/:path', (req, res) => {
       var [grants, loans, outcomes, schools, students] = collections;
       let responseObject = {
         name: getProfileName(collections),
-        path: grants.path,
+        path: req.params.path,
         grants: grants,
         loans: loans,
         outcomes: outcomes,
@@ -162,7 +162,7 @@ app.get('/api/institution/:path', (req, res) => {
       var [grants, loans, outcomes, schools, students] = collections;
       let responseObject = {
         name: getProfileName(collections),
-        path: grants.path,
+        path: req.params.path,
         grants: grants,
         loans: loans,
         outcomes: outcomes,
