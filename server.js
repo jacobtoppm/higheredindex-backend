@@ -27,6 +27,18 @@ var sortAlpha = (a, b) => {
   }
 }
 
+function getProfileName(collections) {
+  let profileName;
+  collections.forEach((d) => {
+    if (d && d.name) {
+      profileName = d.name;
+      return;
+    }
+  })
+
+  return profileName;
+}
+
 // Connect to the database before starting the application server.
 mongodb.MongoClient.connect(dbUrl, function (err, database) {
   if (err) {
@@ -104,7 +116,7 @@ let fetchCollection = (collection, path) => {
       if (err) {
         reject(err);
       } else {
-        console.log("finished " + collection);
+        console.log("finished fetching " + collection);
         resolve(docs);
       }
     })
@@ -119,9 +131,10 @@ app.get('/api/state/:path', (req, res) => {
       fetchCollection("states_schools", req.params.path),
       fetchCollection("states_students", req.params.path),
     ])
-    .then(([grants, loans, outcomes, schools, students]) => {
+    .then((collections) => {
+      var [grants, loans, outcomes, schools, students] = collections;
       let responseObject = {
-        name: grants.name,
+        name: getProfileName(collections),
         path: grants.path,
         grants: grants,
         loans: loans,
@@ -145,9 +158,10 @@ app.get('/api/institution/:path', (req, res) => {
       fetchCollection("inst_schools", req.params.path),
       fetchCollection("inst_students", req.params.path),
     ])
-    .then(([grants, loans, outcomes, schools, students]) => {
+    .then((collections) => {
+      var [grants, loans, outcomes, schools, students] = collections;
       let responseObject = {
-        name: grants.name,
+        name: getProfileName(collections),
         path: grants.path,
         grants: grants,
         loans: loans,
@@ -198,13 +212,11 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
 });
 
 app.get('/api/inst_locations/:state', (req, res) => {
-  console.log(req.params.state)
   db.collection('inst_students').find({STABBR:req.params.state}, {name: 1, path: 1, LONGITUD: 1, LATITUDE: 1}).toArray(function(err, docs) {
     if (err) {
       res.status(500)
       res.render('error', {error:err.message});
     } else {
-      console.log(docs)
       res.status(200).json(docs);
     }
   });
@@ -228,7 +240,6 @@ app.post('/api/update_data/:collection', (req, res) => {
 });
 
 app.post('/api/update_indicator/', (req, res) => {
-  console.log(req.body);
   var action = req.body.action;
   delete req.body.action;
 
@@ -237,7 +248,6 @@ app.post('/api/update_indicator/', (req, res) => {
     delete req.body._id
 
     db.collection('indicators').updateOne({_id: id}, { $set: req.body}, function(err, docs) {
-      console.log(err, docs);
       if (err) {
         handleError(res, err.message, "Failed to set indicators.");
       } else {
