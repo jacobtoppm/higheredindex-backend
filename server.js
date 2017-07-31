@@ -211,8 +211,20 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
   });
 });
 
-app.get('/api/inst_locations/:state', (req, res) => {
-  db.collection('inst_students').find({STABBR:req.params.state}, {name: 1, path: 1, LONGITUD: 1, LATITUDE: 1}).toArray(function(err, docs) {
+app.get('/api/state-congressional-district-info/:state', (req, res) => {
+  db.collection('inst_schools').aggregate(
+      [
+        {
+          $match: {'stabbr': req.params.state}
+        },
+        {
+          $group: {
+            _id: "$cngdstcd",
+            count: { $sum: 1 }
+          }
+        }
+      ]
+    ).toArray(function(err, docs) {
     if (err) {
       res.status(500)
       res.render('error', {error:err.message});
