@@ -68,7 +68,10 @@ app.get('/api/state-list', (req, res) => {
     docs.sort(sortAlpha);
     if (err) {
       res.status(500)
-      res.render('error', {error:err.message});
+      res.json({
+        message: err.message,
+        error: err
+      });
     } else {
       res.status(200).json(docs);
     }
@@ -80,7 +83,10 @@ app.get('/api/institution-list', (req, res) => {
     docs.sort(sortAlpha);
     if (err) {
       res.status(500)
-      res.render('error', {error:err.message});
+      res.json({
+        message: err.message,
+        error: err
+      });
     } else {
       res.status(200).json(docs);
     }
@@ -102,7 +108,10 @@ app.get('/api/data-info', (req, res) => {
   db.collection('data_info').find({}).toArray(function(err, docs) {
     if (err) {
       res.status(500)
-      res.render('error', {error:err.message});
+      res.json({
+        message: err.message,
+        error: err
+      });
     } else {
       res.status(200).json(docs);
     }
@@ -181,7 +190,10 @@ app.get('/api/indicator/:path', (req, res) => {
   db.collection('indicators').findOne({path:req.params.path}, function(err, docs) {
     if (err) {
       res.status(500)
-      res.render('error', {error:err})
+      res.json({
+        message: err.message,
+        error: err
+      });
     } else {
       res.status(200).json(docs);
     }
@@ -204,7 +216,10 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
   db.collection(req.params.collection).find(query, {name : 1}).toArray(function(err, docs) {
     if (err) {
       res.status(500)
-      res.render('error', {error:err.message});
+      res.json({
+        message: err.message,
+        error: err
+      });
     } else {
       res.status(200).json(docs.length);
     }
@@ -227,7 +242,10 @@ app.get('/api/state-congressional-district-info/:state', (req, res) => {
     ).toArray(function(err, docs) {
     if (err) {
       res.status(500)
-      res.render('error', {error:err.message});
+      res.json({
+        message: err.message,
+        error: err
+      });
     } else {
       res.status(200).json(docs);
     }
@@ -240,7 +258,10 @@ app.post('/api/update_data/:collection', (req, res) => {
   db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
     if (err) {
       res.status(500)
-      res.render('error', {error:err})
+      res.json({
+        message: err.message,
+        error: err
+      });
     } else {
       console.log("success!");
       db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date()}}, { upsert: true})
