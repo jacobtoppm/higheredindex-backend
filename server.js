@@ -63,7 +63,7 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/api/state-list', (req, res) => {
+app.get('/api/state-list/', (req, res) => {
   db.collection('states_students').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
     docs.sort(sortAlpha);
     if (err) {
@@ -226,6 +226,20 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
   });
 });
 
+app.get('/api/all-states-data/:collection', (req, res) => {
+  db.collection(req.params.collection).find({}).toArray(function(err, docs) {
+    if (err) {
+      res.status(500)
+      res.json({
+        message: err.message,
+        error: err
+      });
+    } else {
+      res.status(200).json(docs);
+    }
+  });
+});
+
 app.get('/api/state-congressional-district-info/:state', (req, res) => {
   db.collection('inst_schools').aggregate(
       [
@@ -257,6 +271,7 @@ app.post('/api/update_data/:collection', (req, res) => {
 
   db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
     if (err) {
+      console.log(err)
       res.status(500)
       res.json({
         message: err.message,
