@@ -265,13 +265,19 @@ app.get('/api/state-congressional-district-info/:state', (req, res) => {
     }
   });
 });
-
+   
 app.post('/api/update_data/:type/:section/:sector', (req, res) => {
   console.log(req.params.type + "_" + req.params.section)
   console.log(req.params.sector)
   if (req.params.type == "states" && req.params.section == "schools") {
-    db.collection("states_schools").update({ sector: req.params.sector}, { $set: { data : req.body}}, {upsert:true}, function(err, docs) {
-      console.log(err, docs)
+    let sector = req.params.sector;
+    
+    let updatePhrase = {$set:{}};
+    updatePhrase.$set[sector] = req.body;
+
+    db.collection("states_schools").update({}, updatePhrase, {upsert:true}, function(err, docs) {
+      console.log(err)
+      console.log(docs)
       res.status(200).json({});
     })
   } else {
