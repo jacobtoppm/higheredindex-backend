@@ -266,23 +266,33 @@ app.get('/api/state-congressional-district-info/:state', (req, res) => {
   });
 });
 
-app.post('/api/update_data/:collection', (req, res) => {
-  db.collection(req.params.collection).drop();
-
-  db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
-    if (err) {
-      console.log(err)
-      res.status(500)
-      res.json({
-        message: err.message,
-        error: err
-      });
-    } else {
-      console.log("success!");
-      db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date()}}, { upsert: true})
+app.post('/api/update_data/:type/:section/:sector', (req, res) => {
+  console.log(req.params.type + "_" + req.params.section)
+  console.log(req.params.sector)
+  if (req.params.type == "states" && req.params.section == "schools") {
+    db.collection("states_schools").update({ sector: req.params.sector}, { $set: { data : req.body}}, {upsert:true}, function(err, docs) {
+      console.log(err, docs)
       res.status(200).json({});
-    }
-  });
+    })
+  } else {
+    let collectionName = req.params.type + "_" + req.params.section;
+    db.collection(collectionName).drop();
+
+    db.collection(collectionName).insertMany(req.body, function(err, docs) {
+      if (err) {
+        console.log(err)
+        res.status(500)
+        res.json({
+          message: err.message,
+          error: err
+        });
+      } else {
+        console.log("success!");
+        db.collection("data_info").updateOne({collection: req.params.type + " " + req.params.section}, { $set: {last_updated: new Date()}}, { upsert: true})
+        res.status(200).json({});
+      }
+    });
+  }
 
 
 });
