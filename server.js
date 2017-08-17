@@ -137,18 +137,29 @@ app.get('/api/state/:path', (req, res) => {
       fetchCollection("states_grants", req.params.path),
       fetchCollection("states_loans", req.params.path),
       fetchCollection("states_outcomes", req.params.path),
-      fetchCollection("states_schools", req.params.path),
+      fetchCollection("states_schools_all", req.params.path),
+      fetchCollection("states_schools_public4", req.params.path),
+      fetchCollection("states_schools_public2", req.params.path),
+      fetchCollection("states_schools_nonprofit", req.params.path),
+      fetchCollection("states_schools_forprofit", req.params.path),
+      fetchCollection("states_outcomes", req.params.path),
       fetchCollection("states_students", req.params.path),
     ])
     .then((collections) => {
-      var [grants, loans, outcomes, schools, students] = collections;
+      var [grants, loans, outcomes, schools_all, schools_public4, schools_public2, schools_nonprofit, schools_forprofit, students] = collections;
       let responseObject = {
         name: getProfileName(collections),
         path: req.params.path,
         grants: grants,
         loans: loans,
         outcomes: outcomes,
-        schools: schools,
+        schools: {
+          all: schools_all,
+          public4: schools_public4,
+          public2: schools_public2,
+          nonprofit: schools_nonprofit,
+          forprofit: schools_forprofit,
+        },
         students: students
       } 
       res.status(200).json(responseObject); 
@@ -265,24 +276,40 @@ app.get('/api/state-congressional-district-info/:state', (req, res) => {
     }
   });
 });
-
+   
 app.post('/api/update_data/:collection', (req, res) => {
-  db.collection(req.params.collection).drop();
+  // console.log(req.params.type + "_" + req.params.section)
+  // console.log(req.params.sector)
+  // if (req.params.type == "states" && req.params.section == "schools") {
+  //   let sector = req.params.sector;
+    
+  //   let updatePhrase = {$set:{}};
+  //   updatePhrase.$set[sector] = req.body;
 
-  db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
-    if (err) {
-      console.log(err)
-      res.status(500)
-      res.json({
-        message: err.message,
-        error: err
-      });
-    } else {
-      console.log("success!");
-      db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date()}}, { upsert: true})
-      res.status(200).json({});
-    }
-  });
+  //   db.collection("states_schools").updateMany({}, updatePhrase, {upsert:true}, function(err, docs) {
+  //     console.log(err)
+  //     console.log(docs)
+  //     res.status(200).json({});
+  //   })
+  // } else {
+    // let collectionName = req.params.type + "_" + req.params.section;
+    db.collection(req.params.collection).drop();
+
+    db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
+      if (err) {
+        console.log(err)
+        res.status(500)
+        res.json({
+          message: err.message,
+          error: err
+        });
+      } else {
+        console.log("success!");
+        db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date()}}, { upsert: true})
+        res.status(200).json({});
+      }
+    });
+  // }
 
 
 });
