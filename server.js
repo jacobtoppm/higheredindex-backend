@@ -211,6 +211,31 @@ app.get('/api/indicator/:path', (req, res) => {
   });
 });
 
+app.get('/api/methodology', (req, res) => {
+  db.collection('methodology').findOne({}, function(err, docs) {
+    if (err) {
+      res.status(500)
+      res.json({
+        message: err.message,
+        error: err
+      });
+    } else {
+      console.log(docs)
+      res.status(200).json(docs.text);
+    }
+  });
+});
+
+app.post('/api/update_methodology/', (req, res) => {
+  db.collection('methodology').updateOne({}, { $set: {"text" : req.body.text}, { upsert: true} }, function(err, docs) {
+    if (err) {
+      handleError(res, err.message, "Failed to set methodology.");
+    } else {
+      res.status(200).json(docs);
+    }
+  });  
+});
+
 app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, res) => {
   var variable = req.params.variable + "." + req.params.year;
   var queryVal;
