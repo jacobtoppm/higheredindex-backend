@@ -220,20 +220,21 @@ app.get('/api/methodology', (req, res) => {
         error: err
       });
     } else {
-      console.log(docs)
-      res.status(200).json(docs.text);
+      res.status(200).json(docs);
     }
   });
 });
 
 app.post('/api/update_methodology/', (req, res) => {
-  db.collection('methodology').updateOne({}, { $set: {"text" : req.body.text } }, { upsert: true } , function(err, docs) {
-    if (err) {
-      handleError(res, err.message, "Failed to set methodology.");
-    } else {
-      res.status(200).json(docs);
-    }
-  });  
+  if (req.body && req.body.text) {
+    db.collection('methodology').updateOne({}, { $set: {"text" : req.body.text } }, { upsert: true } , function(err, docs) {
+      if (err) {
+        handleError(res, err.message, "Failed to set methodology.");
+      } else {
+        res.status(200).json(docs);
+      }
+    });
+  }
 });
 
 app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, res) => {
