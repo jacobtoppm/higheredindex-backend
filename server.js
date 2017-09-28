@@ -227,7 +227,7 @@ app.get('/api/methodology', (req, res) => {
 });
 
 app.post('/api/update_methodology/', (req, res) => {
-  db.collection('methodology').updateOne({}, { $set: {"text" : req.body.text}, { upsert: true} }, function(err, docs) {
+  db.collection('methodology').updateOne({}, { $set: {"text" : req.body.text } }, { upsert: true } , function(err, docs) {
     if (err) {
       handleError(res, err.message, "Failed to set methodology.");
     } else {
