@@ -9,6 +9,8 @@ const path = require('path');
 const dbUrl = process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/febp" : "mongodb://heroku_2l5qrfnd:bm3ve3469v2or4vpb1c2ajq0rm@ds151909.mlab.com:51909/heroku_2l5qrfnd";
 var app = express();
 
+const statesList = ["AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"];
+
 app.use(bodyParser.json({limit: '100mb'}));
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
@@ -37,6 +39,18 @@ function getProfileName(collections) {
   })
 
   return profileName;
+}
+
+function isFiftyState(abbrev) {
+  if (!abbrev) { return false; }
+  console.log(abbrev)
+  if (statesList.indexOf(abbrev) > -1) {
+    console.log("true")
+    return true;
+  } else {
+    console.log("false")
+    return false;
+  }
 }
 
 // Connect to the database before starting the application server.
@@ -241,6 +255,7 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
   var variable = req.params.variable + "." + req.params.year;
   var queryVal;
   var query = {};
+  console.log("getting ranking")
 
   if (req.params.direction == "lowest") {
     queryVal = { $lt : Number(req.params.value)};
@@ -250,7 +265,7 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
   
   query[variable] = queryVal;
 
-  db.collection(req.params.collection).find(query, {name : 1}).toArray(function(err, docs) {
+  db.collection(req.params.collection).find(query, {state : 1}).toArray(function(err, docs) {
     if (err) {
       res.status(500)
       res.json({
@@ -258,7 +273,8 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
         error: err
       });
     } else {
-      res.status(200).json(docs.length);
+      
+      res.status(200).json(docs.filter((d) => { return isFiftyState(d.state); }).length);
     }
   });
 });
@@ -272,7 +288,7 @@ app.get('/api/all-states-data/:collection', (req, res) => {
         error: err
       });
     } else {
-      res.status(200).json(docs);
+      res.status(200).json(docs.filter((d) => { return isFiftyState(d.state); }));
     }
   });
 });
