@@ -293,6 +293,20 @@ app.get('/api/all-states-data/:collection', (req, res) => {
   });
 });
 
+app.get('/api/us-data/:collection', (req, res) => {
+  db.collection(req.params.collection).findOne({"state":"US"}, function(err, docs) {
+    if (err) {
+      res.status(500)
+      res.json({
+        message: err.message,
+        error: err
+      });
+    } else {
+      res.status(200).json(docs.filter((d) => { return isFiftyState(d.state); }));
+    }
+  });
+});
+
 app.get('/api/state-congressional-district-info/:state', (req, res) => {
   db.collection('inst_schools').aggregate(
       [
