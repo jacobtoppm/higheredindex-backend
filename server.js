@@ -302,7 +302,7 @@ app.get('/api/us-data/:collection', (req, res) => {
         error: err
       });
     } else {
-      res.status(200).json(docs.filter((d) => { return isFiftyState(d.state); }));
+      res.status(200).json(docs);
     }
   });
 });
