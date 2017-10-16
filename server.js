@@ -311,7 +311,7 @@ app.get('/api/state-congressional-district-info/:state', (req, res) => {
   db.collection('inst_schools').aggregate(
       [
         {
-          $match: {'stabbr': req.params.state}
+          $match: {'state': req.params.state}
         },
         {
           $group: {
