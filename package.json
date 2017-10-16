@@ -4,8 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start-dev": "NODE_ENV=development node server.js",
-    "start": "node server.js"
+    "start-dev": "NODE_ENV=development node --expose-gc server.js",
+    "start": "node --expose-gc server.js"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,8 @@
     "mongonaut": "^3.0.0",
     "path": "^0.12.7",
     "react": "^15.5.4"
+  },
+  "devDependencies": {
+    "heapdump": "^0.3.9"
   }
 }
