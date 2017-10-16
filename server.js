@@ -411,7 +411,8 @@ app.get('/api/download_data/:collection', (req, res) => {
           console.log(process.memoryUsage().heapUsed)
           res.download(collection + '.csv');
           console.log(process.memoryUsage().heapUsed)
-
+          global.gc()
+          console.log(process.memoryUsage().heapUsed)
         });
       });
     }
