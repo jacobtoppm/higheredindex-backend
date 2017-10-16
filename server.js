@@ -4,6 +4,7 @@ var mongodb = require("mongodb");
 var Mongonaut = require("mongonaut");
 var json2csv = require('json2csv');
 var fs = require('fs');
+var heapdump = require('heapdump');
 var dataProcessingFunctions = require("./processUploadedData.js")
 const path = require('path');
 const dbUrl = process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/febp" : "mongodb://heroku_2l5qrfnd:bm3ve3469v2or4vpb1c2ajq0rm@ds151909.mlab.com:51909/heroku_2l5qrfnd";
@@ -334,21 +335,6 @@ app.get('/api/state-congressional-district-info/:state', (req, res) => {
 });
    
 app.post('/api/update_data/:collection', (req, res) => {
-  // console.log(req.params.type + "_" + req.params.section)
-  // console.log(req.params.sector)
-  // if (req.params.type == "states" && req.params.section == "schools") {
-  //   let sector = req.params.sector;
-    
-  //   let updatePhrase = {$set:{}};
-  //   updatePhrase.$set[sector] = req.body;
-
-  //   db.collection("states_schools").updateMany({}, updatePhrase, {upsert:true}, function(err, docs) {
-  //     console.log(err)
-  //     console.log(docs)
-  //     res.status(200).json({});
-  //   })
-  // } else {
-    // let collectionName = req.params.type + "_" + req.params.section;
     db.collection(req.params.collection).drop();
 
     db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
@@ -365,7 +351,6 @@ app.post('/api/update_data/:collection', (req, res) => {
         res.status(200).json({});
       }
     });
-  // }
 
 
 });
@@ -411,18 +396,23 @@ app.post('/api/update_indicator/', (req, res) => {
 
 app.get('/api/download_data/:collection', (req, res) => {
   const { collection } = req.params;
+
+  console.log(process.memoryUsage().heapUsed)
   
   db.collection(collection).find({}).toArray(function(err, docs) {
+    console.log(process.memoryUsage().heapUsed)
     if (err) {
       handleError(res, err.message, "Failed to get");
     } else {
       json2csv({ data:docs, flatten:true}, function(err, csv) {
         if (err) return console.log(err);
-        
+        console.log(process.memoryUsage().heapUsed)
         fs.writeFile(collection + '.csv', csv, function(err) {
           if (err) throw err;
-          
+          console.log(process.memoryUsage().heapUsed)
           res.download(collection + '.csv');
+          console.log(process.memoryUsage().heapUsed)
+
         });
       });
     }
