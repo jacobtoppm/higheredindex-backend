@@ -350,8 +350,26 @@ app.post('/api/update_data/:collection', (req, res) => {
         res.status(200).json({});
       }
     });
+});
 
+app.post('/api/update_codebook/:type', (req, res) => {
+  console.log(typeof req.body)
+  console.log(req.body)
 
+  db.collection("codebooks").replaceOne({type: req.params.type}, req.body, { upsert: true}, function(err, docs) {
+    if (err) {
+      console.log(err)
+      res.status(500)
+      res.json({
+        message: err.message,
+        error: err
+      });
+    } else {
+      console.log("success!");
+      db.collection("data_info").updateOne({collection: "codebook " + req.params.type}, { $set: {last_updated: new Date()}}, { upsert: true})
+      res.status(200).json({});
+    }
+  })
 });
 
 app.post('/api/update_indicator/', (req, res) => {
@@ -413,6 +431,26 @@ app.get('/api/download_data/:collection', (req, res) => {
           console.log(process.memoryUsage().heapUsed)
           global.gc()
           console.log(process.memoryUsage().heapUsed)
+        });
+      });
+    }
+  });
+});
+
+app.get('/api/download_codebook/:type', (req, res) => {
+  const { type } = req.params;
+  
+  db.collection("codebooks").find({"type":type}).toArray(function(err, docs) {
+    if (err || !docs || !docs[0]) {
+      handleError(res, err.message, "Failed to get");
+    } else {
+      json2csv({ data:docs[0].data}, function(err, csv) {
+        if (err) return console.log(err);
+  
+        fs.writeFile(type + '.csv', csv, function(err) {
+          if (err) throw err;
+    
+          res.download(type + '.csv');
         });
       });
     }
