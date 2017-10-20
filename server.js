@@ -346,16 +346,13 @@ app.post('/api/update_data/:collection', (req, res) => {
         });
       } else {
         console.log("success!");
-        db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date()}}, { upsert: true})
+        db.collection("data_info").updateOne({collection: req.params.collection}, { $set: {last_updated: new Date(), fileType: "data"}}, { upsert: true})
         res.status(200).json({});
       }
     });
 });
 
 app.post('/api/update_codebook/:type', (req, res) => {
-  console.log(typeof req.body)
-  console.log(req.body)
-
   db.collection("codebooks").replaceOne({type: req.params.type}, req.body, { upsert: true}, function(err, docs) {
     if (err) {
       console.log(err)
@@ -366,7 +363,7 @@ app.post('/api/update_codebook/:type', (req, res) => {
       });
     } else {
       console.log("success!");
-      db.collection("data_info").updateOne({collection: "codebook " + req.params.type}, { $set: {last_updated: new Date()}}, { upsert: true})
+      db.collection("data_info").updateOne({collection: "codebook_" + req.params.type}, { $set: {last_updated: new Date(), fileType: "codebook"}}, { upsert: true})
       res.status(200).json({});
     }
   })
