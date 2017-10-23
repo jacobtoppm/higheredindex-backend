@@ -377,7 +377,7 @@ app.post('/api/update_indicator/', (req, res) => {
     var id = new mongodb.ObjectId(req.body._id);
     delete req.body._id
 
-    db.collection('indicators').updateOne({_id: id}, { $set: req.body}, function(err, docs) {
+    db.collection('indicators').updateOne({_id: id}, { $set: req.body}, { upsert: true}, function(err, docs) {
       if (err) {
         handleError(res, err.message, "Failed to set indicators.");
       } else {
