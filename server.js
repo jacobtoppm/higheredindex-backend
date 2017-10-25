@@ -156,7 +156,6 @@ app.get('/api/state/:path', (req, res) => {
       fetchCollection("states_schools_public2", req.params.path),
       fetchCollection("states_schools_nonprofit", req.params.path),
       fetchCollection("states_schools_forprofit", req.params.path),
-      fetchCollection("states_outcomes", req.params.path),
       fetchCollection("states_students", req.params.path),
     ])
     .then((collections) => {
@@ -279,7 +278,7 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
   });
 });
 
-app.get('/api/all-states-data/:collection', (req, res) => {
+app.get('/api/full-collection/:collection', (req, res) => {
   db.collection(req.params.collection).find({}).toArray(function(err, docs) {
     if (err) {
       res.status(500)
