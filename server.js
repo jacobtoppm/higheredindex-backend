@@ -6,7 +6,8 @@ var json2csv = require('json2csv');
 var fs = require('fs');
 var dataProcessingFunctions = require("./processUploadedData.js")
 const path = require('path');
-const dbUrl = process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/febp" : "mongodb://heroku_2l5qrfnd:bm3ve3469v2or4vpb1c2ajq0rm@ds151909.mlab.com:51909/heroku_2l5qrfnd";
+console.log(process.env.MONGODB_URI)
+const dbUrl = process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/febp" : process.env.MONGODB_URI;
 var app = express();
 
 const statesList = ["AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"];
