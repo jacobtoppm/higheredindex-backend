@@ -1,4 +1,6 @@
 var express = require("express");
+var helmet = require('helmet')
+var cors = require('cors')
 var bodyParser = require("body-parser");
 var mongodb = require("mongodb");
 var Mongonaut = require("mongonaut");
@@ -12,7 +14,13 @@ var app = express();
 
 const statesList = ["AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"];
 
+app.use(helmet())
 app.use(bodyParser.json({limit: '100mb'}));
+
+var corsOptions = {
+  origin: 'https://febp.herokuapp.com',
+  optionsSuccessStatus: 200
+}
 
 // Create a database variable outside of the database connection callback to reuse the connection pool in your app.
 let db;
@@ -239,7 +247,7 @@ app.get('/api/methodology', (req, res) => {
   });
 });
 
-app.post('/api/update_methodology/', (req, res) => {
+app.post('/api/update_methodology/', cors(corsOptions), (req, res) => {
   if (req.body && req.body.text) {
     db.collection('methodology').updateOne({}, { $set: {"text" : req.body.text } }, { upsert: true } , function(err, docs) {
       if (err) {
@@ -326,7 +334,7 @@ app.get('/api/full-collection/:collection', (req, res) => {
 
       console.log(responseArray)
       
-      res.status(200).json(responseArray); 
+      res.status(200).json(responseArray.filter((d) => { return isFiftyState(d.state); })) 
     })
     .catch(function(err) {
       // Will catch failure of first failed promise
@@ -427,7 +435,7 @@ app.get('/api/state-congressional-district-info/:state', (req, res) => {
   });
 });
    
-app.post('/api/update_data/:collection', (req, res) => {
+app.post('/api/update_data/:collection', cors(corsOptions), (req, res) => {
     db.collection(req.params.collection).drop();
 
     db.collection(req.params.collection).insertMany(req.body, function(err, docs) {
@@ -446,7 +454,7 @@ app.post('/api/update_data/:collection', (req, res) => {
     });
 });
 
-app.post('/api/update_codebook/:type', (req, res) => {
+app.post('/api/update_codebook/:type', cors(corsOptions), (req, res) => {
   db.collection("codebooks").replaceOne({type: req.params.type}, req.body, { upsert: true}, function(err, docs) {
     if (err) {
       console.log(err)
@@ -463,7 +471,7 @@ app.post('/api/update_codebook/:type', (req, res) => {
   })
 });
 
-app.post('/api/update_indicator/', (req, res) => {
+app.post('/api/update_indicator/', cors(corsOptions), (req, res) => {
   var action = req.body.action;
   delete req.body.action;
 

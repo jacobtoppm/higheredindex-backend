@@ -19,7 +19,9 @@
   "homepage": "https://github.com/newamericafoundation/febp-backend#readme",
   "dependencies": {
     "body-parser": "^1.16.1",
+    "cors": "^2.8.4",
     "express": "^4.14.1",
+    "helmet": "^3.9.0",
     "json2csv": "^3.7.3",
     "mongodb": "^2.2.23",
     "mongonaut": "^3.0.0",
