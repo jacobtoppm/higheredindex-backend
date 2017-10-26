@@ -280,15 +280,15 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
 });
 
 app.get('/api/full-collection/:collection', (req, res) => {
-  if (req.params.collection.indexOf("|") > -1) {
-    let collections = req.params.collection.split("|")
+  if (req.params.collection.indexOf("-") > -1) {
+    let collections = req.params.collection.split("-")
     Promise.all([
       new Promise((resolve, reject) => {
         db.collection(collections[0]).find({}).toArray(function(err, docs) {
           if (err) {
             reject(err);
           } else {
-            console.log("finished fetching " + collection);
+            console.log("finished fetching " + collections[0]);
             resolve(docs);
           }
         })
@@ -298,7 +298,7 @@ app.get('/api/full-collection/:collection', (req, res) => {
           if (err) {
             reject(err);
           } else {
-            console.log("finished fetching " + collection);
+            console.log("finished fetching " + collections[1]);
             resolve(docs);
           }
         })
@@ -348,15 +348,15 @@ app.get('/api/full-collection/:collection', (req, res) => {
 });
 
 app.get('/api/us-data/:collection', (req, res) => {
-  if (req.params.collection.indexOf("|") > -1) {
-    let collections = req.params.collection.split("|")
+  if (req.params.collection.indexOf("-") > -1) {
+    let collections = req.params.collection.split("-")
     Promise.all([
       new Promise((resolve, reject) => {
         db.collection(collections[0]).findOne({"state":"US"}, function(err, docs) {
           if (err) {
             reject(err);
           } else {
-            console.log("finished fetching " + collection);
+            console.log("finished fetching " + collections[0]);
             resolve(docs);
           }
         })
@@ -366,7 +366,7 @@ app.get('/api/us-data/:collection', (req, res) => {
           if (err) {
             reject(err);
           } else {
-            console.log("finished fetching " + collection);
+            console.log("finished fetching " + collections[1]);
             resolve(docs);
           }
         })
