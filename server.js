@@ -280,31 +280,125 @@ app.get('/api/get-ranking/:collection/:direction/:variable/:year/:value', (req, 
 });
 
 app.get('/api/full-collection/:collection', (req, res) => {
-  db.collection(req.params.collection).find({}).toArray(function(err, docs) {
-    if (err) {
-      res.status(500)
-      res.json({
-        message: err.message,
-        error: err
-      });
-    } else {
-      res.status(200).json(docs.filter((d) => { return isFiftyState(d.state); }));
-    }
-  });
+  if (req.params.collection.indexOf("|") > -1) {
+    let collections = req.params.collection.split("|")
+    Promise.all([
+      new Promise((resolve, reject) => {
+        db.collection(collections[0]).find({}).toArray(function(err, docs) {
+          if (err) {
+            reject(err);
+          } else {
+            console.log("finished fetching " + collection);
+            resolve(docs);
+          }
+        })
+      }),
+      new Promise((resolve, reject) => {
+        db.collection(collections[1]).find({}).toArray(function(err, docs) {
+          if (err) {
+            reject(err);
+          } else {
+            console.log("finished fetching " + collection);
+            resolve(docs);
+          }
+        })
+      }),
+    ])
+    .then((collections) => {
+      var [coll1, coll2] = collections;
+      var responseArray = []
+
+      console.log(coll1, coll2)
+
+      responseArray = coll1.map((coll1Object) => {
+        let retObject = {};
+        Object.assign(retObject, coll1Object)
+        let state = coll1Object.state;
+
+        coll2.forEach((coll2Object) => {
+          if (coll2Object.state === state) {
+            Object.assign(retObject, coll2Object)
+          }
+        })
+
+        return retObject
+      })
+
+      console.log(responseArray)
+      
+      res.status(200).json(responseArray); 
+    })
+    .catch(function(err) {
+      // Will catch failure of first failed promise
+      console.log("Failed:", err);
+    });
+  } else {
+    db.collection(req.params.collection).find({}).toArray(function(err, docs) {
+      if (err) {
+        res.status(500)
+        res.json({
+          message: err.message,
+          error: err
+        });
+      } else {
+        res.status(200).json(docs.filter((d) => { return isFiftyState(d.state); }));
+      }
+    });
+  }
 });
 
 app.get('/api/us-data/:collection', (req, res) => {
-  db.collection(req.params.collection).findOne({"state":"US"}, function(err, docs) {
-    if (err) {
-      res.status(500)
-      res.json({
-        message: err.message,
-        error: err
-      });
-    } else {
-      res.status(200).json(docs);
-    }
-  });
+  if (req.params.collection.indexOf("|") > -1) {
+    let collections = req.params.collection.split("|")
+    Promise.all([
+      new Promise((resolve, reject) => {
+        db.collection(collections[0]).findOne({"state":"US"}, function(err, docs) {
+          if (err) {
+            reject(err);
+          } else {
+            console.log("finished fetching " + collection);
+            resolve(docs);
+          }
+        })
+      }),
+      new Promise((resolve, reject) => {
+        db.collection(collections[1]).findOne({"state":"US"}, function(err, docs) {
+          if (err) {
+            reject(err);
+          } else {
+            console.log("finished fetching " + collection);
+            resolve(docs);
+          }
+        })
+      }),
+    ])
+    .then((collections) => {
+      var [coll1, coll2] = collections;
+      var responseObject = {}
+
+      Object.assign(responseObject, coll1, coll2)
+
+      console.log(responseObject)
+      
+      res.status(200).json(responseObject); 
+    })
+    .catch(function(err) {
+      // Will catch failure of first failed promise
+      console.log("Failed:", err);
+    });
+  } else {
+    db.collection(req.params.collection).findOne({"state":"US"}, function(err, docs) {
+      if (err) {
+        res.status(500)
+        res.json({
+          message: err.message,
+          error: err
+        });
+      } else {
+        res.status(200).json(docs);
+      }
+    });
+  }
 });
 
 app.get('/api/state-congressional-district-info/:state', (req, res) => {
