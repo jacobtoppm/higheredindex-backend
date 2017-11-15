@@ -8,8 +8,10 @@ var json2csv = require('json2csv');
 var fs = require('fs');
 var dataProcessingFunctions = require("./processUploadedData.js")
 const path = require('path');
-console.log(process.env.MONGODB_URI)
+
 const dbUrl = process.env.NODE_ENV == "development" ? "mongodb://localhost:27017/febp" : process.env.MONGODB_URI;
+// const dbUrl = process.env.MONGODB_URI
+
 var app = express();
 
 const statesList = ["AK","AL","AR","AZ","CA","CO","CT","DC","DE","FL","GA","HI","IA","ID","IL","IN","KS","KY","LA","MA","MD","ME","MI","MN","MO","MS","MT","NC","ND","NE","NH","NJ","NM","NV","NY","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VA","VT","WA","WI","WV","WY"];
@@ -102,7 +104,7 @@ app.get('/api/state-list/', (req, res) => {
 });
 
 app.get('/api/institution-list', (req, res) => {
-  db.collection('inst_students').find({}, { name: 1, path: 1 }).toArray(function(err, docs) {
+  db.collection('inst_students').find({}, { name: 1, path: 1, sector: 1, state: 1 }).toArray(function(err, docs) {
     docs.sort(sortAlpha);
     if (err) {
       res.status(500)
