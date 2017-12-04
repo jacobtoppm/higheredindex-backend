@@ -20,7 +20,7 @@ app.use(helmet())
 app.use(bodyParser.json({limit: '100mb'}));
 
 var corsOptions = {
-  origin: 'https://febp.herokuapp.com',
+  origin: 'https://higheredindex.newamerica.org',
   optionsSuccessStatus: 200
 }
 
